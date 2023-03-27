@@ -25,8 +25,9 @@ def corner_response_function(input_img, window_size, alpha, threshold):
     x_grad = Sobel_filter_x(input_img)
     y_grad = Sobel_filter_y(input_img)
     
+    
     I_xx, I_yy, I_xy = x_grad * x_grad, y_grad * y_grad, x_grad * y_grad
-    window = np.ones((window_size, window_size))
+    window = np.full((window_size, window_size), 1)
     
     H, W = I_xx.shape
     KH, KW = window_size, window_size
@@ -40,7 +41,6 @@ def corner_response_function(input_img, window_size, alpha, threshold):
     all_value = np.stack((I_xx, I_xy, I_xy, I_yy), axis = 2).reshape(H, W, 2, 2)
     det = np.linalg.det(all_value)
     tr = np.trace(all_value, axis1 = 2, axis2 = 3)
-    
     theta = det - alpha * tr * tr
     
     ret = np.where(theta > threshold)
@@ -58,7 +58,7 @@ if __name__=="__main__":
 
     #you can adjust the parameters to fit your own implementation 
     window_size = 5
-    alpha = 0.04
+    alpha = 0.06
     threshold = 10
 
     corner_list = corner_response_function(input_img,window_size,alpha,threshold)
@@ -70,7 +70,7 @@ if __name__=="__main__":
     dis = 10
     for i in corner_list_sorted :
         for j in NML_selected :
-            if(abs(i[0] - j[0] <= dis) and abs(i[1] - j[1]) <= dis) :
+            if(abs(i[0] - j[0]) <= dis and abs(i[1] - j[1]) <= dis) :
                 break
         else :
             NML_selected.append(i[:-1])

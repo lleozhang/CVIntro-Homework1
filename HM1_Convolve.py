@@ -83,28 +83,29 @@ def convolve(img, kernel):
     
     #build the sliding-window convolution here
     fl_img = img.flatten()
-    tgt_siz = img.shape[0] - kernel.shape[0] + 1
+    tgt_H = img.shape[0] - kernel.shape[0] + 1
+    tgt_W = img.shape[1] - kernel.shape[1] + 1
     
     ori_columns = np.arange(kernel.shape[1])
     repeat_columns = ori_columns.reshape(-1, 1).repeat(kernel.shape[0], axis = 1).T.reshape(1, -1)
     
-    added = np.arange(tgt_siz).repeat(kernel.shape[0] * kernel.shape[1]).reshape(tgt_siz, -1)
+    added = np.arange(tgt_W).repeat(kernel.shape[0] * kernel.shape[1]).reshape(tgt_W, -1)
     added_column = np.arange(kernel.shape[0]).repeat(kernel.shape[1])
-    all_added = added.reshape(-1, 1).repeat(tgt_siz, axis = 1).T.reshape(tgt_siz * tgt_siz, -1)
+    all_added = added.reshape(-1, 1).repeat(tgt_H, axis = 1).T.reshape(tgt_H * tgt_W, -1)
     
-    lines = np.arange(tgt_siz).repeat(tgt_siz).reshape(-1, 1)
+    lines = np.arange(tgt_H).repeat(tgt_W).reshape(-1, 1)
     all_added = all_added + lines * img.shape[1]
     
     first_column = repeat_columns + added_column * img.shape[1]
-    tmp_columns = first_column.reshape(-1, 1).repeat(tgt_siz * tgt_siz, axis = 1).T
+    tmp_columns = first_column.reshape(-1, 1).repeat(tgt_H * tgt_W, axis = 1).T
         
     all_column = tmp_columns + all_added
-    all_lines = np.arange(tgt_siz * tgt_siz)
+    all_lines = np.arange(tgt_H * tgt_W)
     
-    M = np.zeros((tgt_siz * tgt_siz, kernel.shape[0] * kernel.shape[1]))
+    M = np.zeros((tgt_H * tgt_W, kernel.shape[0] * kernel.shape[1]))
     M[all_lines] = fl_img[all_column]
     
-    output = (M @ kernel.reshape(-1, 1)).reshape(tgt_siz, tgt_siz)
+    output = (M @ kernel.reshape(-1, 1)).reshape(tgt_H, tgt_W)
     
     return output
 
